@@ -67,12 +67,18 @@
       <artifactId>guava</artifactId>
       <version>16.0.1</version>
     </dependency>
-    <dependency>
-      <!-- provides logging -->
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>1.7.21</version>
-    </dependency>
+	  <dependency>
+		  <!-- provides logging -->
+		  <groupId>org.slf4j</groupId>
+		  <artifactId>slf4j-api</artifactId>
+		  <version>1.7.25</version>
+	  </dependency>
+	  <dependency>
+		  <!-- provides logging -->
+		  <groupId>org.slf4j</groupId>
+		  <artifactId>slf4j-simple</artifactId>
+		  <version>1.7.25</version>
+	  </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -109,6 +115,25 @@
           <source>1.8</source>
           <target>1.8</target>
         </configuration>
+      </plugin>
+      <plugin>
+	<groupId>org.codehaus.mojo</groupId>
+	<artifactId>exec-maven-plugin</artifactId>
+	<version>1.6.0</version>
+	<executions>
+	  <execution>
+	    <goals>
+	      <goal>exec</goal>
+	    </goals>
+	  </execution>
+	</executions>
+	<configuration>
+	  <executable>maven</executable>
+	  <mainClass>com.github.yin.html.WebTextExtractor</mainClass>
+	  <arguments>
+	    <argument>https://en.wikipedia.org/</argument>
+	  </arguments>
+	</configuration>
       </plugin>
       <plugin>
 	<!-- Releases maven package to OSSHR -->
