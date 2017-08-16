@@ -5,15 +5,15 @@ import com.github.yin.flags.Flags;
 import com.github.yin.flags.annotations.FlagDesc;
 import com.google.common.collect.ImmutableList;
 
-import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CommandLineMain implements Runnable {
+public class CommandLineMain {
 	@FlagDesc("Print only text-statistics. Default: true")
 	static final Flag<Boolean> stats = Flags.create(true);
 
@@ -21,13 +21,6 @@ public class CommandLineMain implements Runnable {
 	static final Flag<Boolean> alts = Flags.create(false);
 
 	private static final Logger log = LoggerFactory.getLogger(CommandLineMain.class);
-	private final WebDocumentProvider extractor;
-	private final TextProcessor processor;
-
-	public CommandLineMain(WebDocumentProvider extractor, TextProcessor processor) {
-		this.extractor = extractor;
-		this.processor = processor;
-	}
 
 	public static void main(String[] args) {
 		List<String> positional = Flags.parse(args, ImmutableList.of("com.github.yin.html"));
@@ -35,17 +28,19 @@ public class CommandLineMain implements Runnable {
 		ExecutorService executorService = Executors.newSingleThreadExecutor();
 
 		for (String url : positional) {
-			executorService.execute(new CommandLineMain(new WebDocumentProvider(url), new StatisticProcessor()));
+			executorService.execute(new TextProcessingTask<>(new WebDocumentProvider(url), new StatisticProcessor(),
+					(TextStatictics stats) -> {
+						log.info("URL: {}", url);
+						log.info("Word counts:");
+						for (Map.Entry entry : stats.wordFrequency().entrySet()) {
+							log.info("\t{} => {}", entry.getKey(), entry.getValue());
+						}
+						log.info("Longest word: {}", stats.longestWord());
+						log.info("Most used character: {}", stats.mostUsedChar());
+
+					}));
 		}
 		executorService.shutdown();
 	}
 
-	@Override
-	public void run() {
-		try {
-			processor.process(extractor.extract());
-		} catch (IOException ex) {
-			log.error("Could not process url: " + extractor.getUrl(), ex);
-		}
-	}
 }
