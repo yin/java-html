@@ -28,7 +28,7 @@ public class WebServerMain {
 		WebServiceHandler rpcHandler = new WebServiceHandler(rpcServer);
 */
 		ContextHandler webservice = new ContextHandler();
-		webservice.setContextPath("/");
+		webservice.setContextPath("/api");
 //		webservice.setHandler(rpcHandler);
 
 		ContextHandlerCollection contexts = new ContextHandlerCollection();
