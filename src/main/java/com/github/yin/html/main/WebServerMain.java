@@ -69,7 +69,7 @@ public class WebServerMain {
 		webservice.setHandler(rpcHandler);
 
 		ContextHandlerCollection contexts = new ContextHandlerCollection();
-		//contexts.addHandler(webservice);
+		contexts.addHandler(webservice);
 		contexts.addHandler(new DefaultHandler());
 
 		server.setHandler(contexts);

@@ -4,13 +4,13 @@ import com.github.yin.flags.Flag;
 import com.github.yin.flags.Flags;
 import com.github.yin.flags.annotations.FlagDesc;
 import com.github.yin.html.StatisticProcessor;
+import com.github.yin.html.TestStatisticsPrinter;
 import com.github.yin.html.TextProcessingTask;
 import com.github.yin.html.TextStatictics;
 import com.github.yin.html.WebDocumentProvider;
 import com.google.common.collect.ImmutableList;
 
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -37,13 +37,8 @@ public class CommandLineMain {
 				public void run() {
 					TextStatictics stats = new TextProcessingTask<>(new WebDocumentProvider(url),
 							new StatisticProcessor()).execute();
-					log.info("URL: {}", url);
-					log.info("Word counts:");
-					for (Map.Entry entry : stats.wordFrequency().entrySet()) {
-						log.info("\t{} => {}", entry.getKey(), entry.getValue());
-					}
-					log.info("Longest word: {}", stats.longestWord());
-					log.info("Most used character: {}", stats.mostUsedChar());
+					System.out.printf("URL: %s\n", url);
+					new TestStatisticsPrinter(System.out).accept(stats);
 				}
 			});
 		}
