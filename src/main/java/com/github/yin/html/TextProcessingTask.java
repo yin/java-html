@@ -1,5 +1,7 @@
 package com.github.yin.html;
 
+import com.github.yin.html.main.CommandLineMain;
+
 import java.io.IOException;
 import java.util.function.Consumer;
 

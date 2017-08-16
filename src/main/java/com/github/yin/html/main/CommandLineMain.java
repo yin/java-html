@@ -1,8 +1,12 @@
-package com.github.yin.html;
+package com.github.yin.html.main;
 
 import com.github.yin.flags.Flag;
 import com.github.yin.flags.Flags;
 import com.github.yin.flags.annotations.FlagDesc;
+import com.github.yin.html.StatisticProcessor;
+import com.github.yin.html.TextProcessingTask;
+import com.github.yin.html.TextStatictics;
+import com.github.yin.html.WebDocumentProvider;
 import com.google.common.collect.ImmutableList;
 
 import java.util.List;
