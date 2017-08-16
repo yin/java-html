@@ -32,17 +32,20 @@ public class CommandLineMain {
 		ExecutorService executorService = Executors.newSingleThreadExecutor();
 
 		for (String url : positional) {
-			executorService.execute(new TextProcessingTask<>(new WebDocumentProvider(url), new StatisticProcessor(),
-					(TextStatictics stats) -> {
-						log.info("URL: {}", url);
-						log.info("Word counts:");
-						for (Map.Entry entry : stats.wordFrequency().entrySet()) {
-							log.info("\t{} => {}", entry.getKey(), entry.getValue());
-						}
-						log.info("Longest word: {}", stats.longestWord());
-						log.info("Most used character: {}", stats.mostUsedChar());
-
-					}));
+			executorService.execute(new Runnable() {
+				@Override
+				public void run() {
+					TextStatictics stats = new TextProcessingTask<>(new WebDocumentProvider(url),
+							new StatisticProcessor()).execute();
+					log.info("URL: {}", url);
+					log.info("Word counts:");
+					for (Map.Entry entry : stats.wordFrequency().entrySet()) {
+						log.info("\t{} => {}", entry.getKey(), entry.getValue());
+					}
+					log.info("Longest word: {}", stats.longestWord());
+					log.info("Most used character: {}", stats.mostUsedChar());
+				}
+			});
 		}
 		executorService.shutdown();
 	}

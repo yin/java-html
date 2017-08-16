@@ -1,4 +1,5 @@
 package com.github.yin.html;
 
-public interface ProcessingTask extends Runnable {
+public interface ProcessingTask<R> {
+	R execute();
 }
