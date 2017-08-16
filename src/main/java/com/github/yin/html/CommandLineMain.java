@@ -13,18 +13,18 @@ import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class WebTextExtractor implements Runnable {
+public class CommandLineMain implements Runnable {
 	@FlagDesc("Print only text-statistics. Default: true")
 	static final Flag<Boolean> stats = Flags.create(true);
 
 	@FlagDesc("Replace tags with alt value, which have the attribute. Default: false")
 	static final Flag<Boolean> alts = Flags.create(false);
 
-	private static final Logger log = LoggerFactory.getLogger(WebTextExtractor.class);
+	private static final Logger log = LoggerFactory.getLogger(CommandLineMain.class);
 	private final WebDocumentProvider extractor;
 	private final TextProcessor processor;
 
-	public WebTextExtractor(WebDocumentProvider extractor, TextProcessor processor) {
+	public CommandLineMain(WebDocumentProvider extractor, TextProcessor processor) {
 		this.extractor = extractor;
 		this.processor = processor;
 	}
@@ -35,7 +35,7 @@ public class WebTextExtractor implements Runnable {
 		ExecutorService executorService = Executors.newSingleThreadExecutor();
 
 		for (String url : positional) {
-			executorService.execute(new WebTextExtractor(new WebDocumentProvider(url), new StatisticProcessor()));
+			executorService.execute(new CommandLineMain(new WebDocumentProvider(url), new StatisticProcessor()));
 		}
 		executorService.shutdown();
 	}
