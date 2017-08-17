@@ -1,6 +1,5 @@
 package com.github.yin.html.main;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.yin.html.jetty.WebServiceHandler;
 import com.github.yin.html.modules.JettyHttpServerModule;
 import com.github.yin.html.modules.JsonRpcServerModule;
@@ -11,11 +10,12 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.googlecode.jsonrpc4j.JsonRpcServer;
 
-import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.DefaultHandler;
+import org.eclipse.jetty.server.handler.ResourceHandler;
+import org.eclipse.jetty.util.resource.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,13 +48,11 @@ public class WebServerMain {
 			log.info("Starting server");
 		}
 
-		/*
 		ContextHandler webapp = new ContextHandler();
 		webapp.setContextPath("/");
 		ResourceHandler resourceHandler = new ResourceHandler();
 		resourceHandler.setBaseResource(Resource.newClassPathResource("index.html"));
 		webapp.setHandler(resourceHandler);
-		*/
 
 		//*
 		JsonRpcServer rpcServer = injector.getInstance(JsonRpcServer.class);
@@ -69,6 +67,7 @@ public class WebServerMain {
 		webservice.setHandler(rpcHandler);
 
 		ContextHandlerCollection contexts = new ContextHandlerCollection();
+		contexts.addHandler(webapp);
 		contexts.addHandler(webservice);
 		contexts.addHandler(new DefaultHandler());
 

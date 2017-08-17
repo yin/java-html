@@ -17,6 +17,7 @@ import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@FlagDesc
 public class CommandLineMain {
 	@FlagDesc("Print only text-statistics. Default: true")
 	static final Flag<Boolean> stats = Flags.create(true);

@@ -20,6 +20,7 @@ import com.googlecode.jsonrpc4j.JsonRpcHttpClient;
 import com.googlecode.jsonrpc4j.ProxyUtil;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -32,20 +33,19 @@ import org.slf4j.LoggerFactory;
 /**
  * Invokes remote WebService for text statistics processing for each positional argument.
  */
+@FlagDesc
 public class WebServiceClientMain implements Runnable {
 	private static final Logger log = LoggerFactory.getLogger(WebServiceClientMain.class);
 
 	@FlagDesc("URL of the server API to call remotely. Default: http://localhost:8080/")
-	private static final Flag<String> apiUrl = Flags.create("http://localhost:8080/");
-
-	private final URL url;
+	private static final Flag<String> apiUrl = Flags.create("http://localhost:8080/api");
 
 	public static void main(String[] args) throws IOException, InterruptedException {
 		List<String> urls = Flags.parse(args, ImmutableList.of("com.github.yin.html.main"));
 		ExecutorService executor = Executors.newSingleThreadExecutor();
 		for (String url : urls) {
 			try {
-				executor.execute(new WebServiceClientMain(new URL(url)));
+				executor.execute(new WebServiceClientMain());
 			} catch(Throwable t) {
 				log.error("Error getting response from server", t);
 			}
@@ -53,31 +53,37 @@ public class WebServiceClientMain implements Runnable {
 		executor.shutdown();
 	}
 
-	public WebServiceClientMain(URL url) {
-		this.url = checkNotNull(url);
-	}
-
 	@Override
 	public void run() {
-		Injector injector = Guice.createInjector(new ClientModule());
-		WebDocumentStatisticsService client = injector.getInstance(WebDocumentStatisticsService.class);
+		try {
+			Injector injector = Guice.createInjector(new ClientModule(apiUrl.get()));
+			WebDocumentStatisticsService client = injector.getInstance(WebDocumentStatisticsService.class);
 
-		log.info("Making request");
-		TextStatictics response = client.computeStatictics("Test this String, test it well");
-		TestStatisticsPrinter printer = new TestStatisticsPrinter(System.out);
-		log.info("Response received");
+			log.info("Making request");
+			TextStatictics response = client.computeStatictics("Test this String, test it well");
+			TestStatisticsPrinter printer = new TestStatisticsPrinter(System.out);
+			log.info("Response received");
 
-		printer.accept(response);
+			printer.accept(response);
+		} catch (MalformedURLException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	class ClientModule extends AbstractModule {
+		private final URL url;
+
+		public ClientModule(String url) throws MalformedURLException {
+			this.url = new URL(checkNotNull(url));
+		}
+
 		@Override
 		protected void configure() {
 			install(new JacksonModule());
 		}
 
 		@Provides
-		public JsonRpcHttpClient createJsonRpcHttpClient(ObjectMapper mapper) {
+		public JsonRpcHttpClient createJsonRpcHttpClient(ObjectMapper mapper) throws MalformedURLException {
 			return new JsonRpcHttpClient(mapper, url, ImmutableMap.of());
 		}
 
