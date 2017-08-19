@@ -33,15 +33,18 @@
                         tr.append($('<th/>').text(word));
                         tr.append($('<td/>').text(wf[word]));
                     }
+                    $('#loading').hide();
                     $('#result-container').show();
                     $('#error-container').hide();
                 }).fail(function(xhr, err) {
                     console.log("Error", xhr);
+                    $('#loading').hide();
                     $('#results-container').hide();
                     $('#error-container')
                         .html("<p>ERROR: An error happened while contacting the backend service.</p>")
                         .show();
                 });
+                $('#loading').show();
                 return false;
             });
         });
@@ -52,6 +55,7 @@
 <form id="form">
     <input type="url" id="url"/>
     <input type="submit"/>
+    <img src="ajax-loader.gif" alt="Loading..." style="display: none;" id="loading"/>
 </form>
 
 <div id="error-container" style="display:none;">

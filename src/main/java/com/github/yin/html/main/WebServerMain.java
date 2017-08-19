@@ -29,11 +29,9 @@ public class WebServerMain {
 		Server server = injector.getInstance(Server.class);
 		JsonRpcServer rpcServer = injector.getInstance(JsonRpcServer.class);
 
-		ContextHandler webapp = new ContextHandler();
-		webapp.setContextPath("/");
-		ResourceHandler resourceHandler = new ResourceHandler();
-		resourceHandler.setBaseResource(Resource.newClassPathResource("index.html"));
-		webapp.setHandler(resourceHandler);
+		ContextHandler webapp = createContextResource("/", Resource.newClassPathResource("index.html"));
+
+		ContextHandler file1 = createContextResource("/ajax-loader.gif/", Resource.newClassPathResource("ajax-loader.gif"));
 
 		WebServiceHandler rpcHandler = new WebServiceHandler(rpcServer);
 		ContextHandler webservice = new ContextHandler("/api");
@@ -41,6 +39,7 @@ public class WebServerMain {
 
 		ContextHandlerCollection contexts = new ContextHandlerCollection();
 		contexts.addHandler(webapp);
+		contexts.addHandler(file1);
 		contexts.addHandler(webservice);
 		server.setHandler(new HandlerList(contexts, new DefaultHandler()));
 
@@ -50,6 +49,16 @@ public class WebServerMain {
 			server.join();
 			log.info("Server ended");
 		}
+	}
+
+	private static ContextHandler createContextResource(String contextPath, Resource base) {
+		ContextHandler file1 = new ContextHandler(contextPath);
+		{
+			ResourceHandler resourceHandler = new ResourceHandler();
+			resourceHandler.setBaseResource(base);
+			file1.setHandler(resourceHandler);
+		}
+		return file1;
 	}
 
 	private static class StatisticsServiceModule extends AbstractModule {
