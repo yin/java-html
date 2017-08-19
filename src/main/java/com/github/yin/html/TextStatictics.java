@@ -10,13 +10,13 @@ import java.util.Map;
 @AutoValue
 public abstract class TextStatictics {
 	@JsonCreator
-	public static TextStatictics create(@JsonProperty("wordFrequncy") Map<String, Long> wordFrequency,
+	public static TextStatictics create(@JsonProperty("wordFrequency") Map<String, Long> wordFrequency,
 										@JsonProperty("longestWord") String longestWord,
 										@JsonProperty("mostUsedChar") char mostUsedChar) {
 		return new AutoValue_TextStatictics(wordFrequency, longestWord, mostUsedChar);
 	}
 
-	@JsonProperty("wordFrequncy")
+	@JsonProperty("wordFrequency")
 	public abstract Map<String, Long> wordFrequency();
 
 	@JsonProperty("longestWord")

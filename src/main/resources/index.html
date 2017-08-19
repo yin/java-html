@@ -3,9 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <title>Text statistics processor</title>
+    <script
+            src="https://code.jquery.com/jquery-3.2.1.min.js"
+            integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+            crossorigin="anonymous"></script>
+    <script>
+        $(function() {
+            $('#form').submit(function(submitEvent) {
+                submitEvent.preventDefault();
+
+                $.post({
+                    url: '/api/',
+                    dataType: "json",
+                    data:
+                     JSON.stringify({
+                        id: new String(Math.random()),
+                        jsonrpc: "2.0",
+                        method: "computeStatictics",
+                        params: [ $('#url').val() ],
+                    })
+                }).done(function(data) {
+                    console.log("Success", data);
+                    $('#result_longestWord').text(data.result.longestWord)
+                    $('#result_mostUsedChar').text(data.result.mostUsedChar)
+                    var wf = data.result.wordFrequency;
+                    for (var word in wf) {
+                        var tr = $('<tr/>');
+                        $('#result_wordFrequencies').append(tr)
+                        tr.append($('<th/>').text(word));
+                        tr.append($('<td/>').text(wf[word]));
+                    }
+                    $('#result-container').show();
+                    $('#error-container').hide();
+                }).fail(function(xhr, err) {
+                    console.log("Error", xhr);
+                    $('#results-container').hide();
+                    $('#error-container')
+                        .html("<p>ERROR: An error happened while contacting the backend service.</p>")
+                        .show();
+                });
+                return false;
+            });
+        });
+    </script>
 </head>
 <body>
-Test
+
+<form id="form">
+    <input type="url" id="url"/>
+    <input type="submit"/>
+</form>
+
+<div id="error-container" style="display:none;">
+</div>
+
+<div id="result-container" style="display:none;">
+    <h3>Results:</h3>
+    <table>
+        <tr>
+            <th>Longest word</th>
+            <td id="result_longestWord"></td>
+        </tr>
+        <tr>
+            <th>Most used character</th>
+            <td id="result_mostUsedChar"></td>
+        </tr>
+    </table>
+    <table>
+        <thead>
+            <tr>
+                <th colspan="2">Word frequencies</th>
+            </tr>
+        </thead>
+        <tbody id="result_wordFrequencies">
+        </tbody>
+    </table>
+</div>
 
 </body>
 </html>
