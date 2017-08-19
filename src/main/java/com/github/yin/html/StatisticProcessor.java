@@ -19,7 +19,7 @@ public class StatisticProcessor implements TextProcessor<TextStatictics> {
 	@Override
 	public TextStatictics process(String text) {
 		Iterable<String> split = Splitter.on(CharMatcher.JAVA_LETTER_OR_DIGIT.negate())
-				.omitEmptyStrings().split(text);
+				.omitEmptyStrings().split(text.toLowerCase());
 
 		ImmutableList<String> wordList = ImmutableList.copyOf(split);
 
