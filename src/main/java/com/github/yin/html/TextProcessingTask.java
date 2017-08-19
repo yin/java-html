@@ -18,7 +18,7 @@ public class TextProcessingTask<R> implements ProcessingTask<R> {
 			R result = processor.process(text);
 			return result;
 		} catch (IOException ex) {
-			throw new ProcessingRuntimeException();
+			throw new ProcessingRuntimeException("Not able to process statistics due to network error", ex);
 		}
 	}
 

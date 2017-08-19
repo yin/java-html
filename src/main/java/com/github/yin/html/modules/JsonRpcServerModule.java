@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Constructs a {@link JsonRpcServer} and {@link WebServiceHandler} for jetty.
- * See {@linkplain http://www.eclipse.org/jetty/documentation/9.3.x/embedded-examples.html}
+ * See http://www.eclipse.org/jetty/documentation/9.3.x/embedded-examples.html
  */
 public class JsonRpcServerModule extends AbstractModule {
 	private final Module serviceModule;
@@ -57,7 +57,7 @@ public class JsonRpcServerModule extends AbstractModule {
 
 	@Provides
 	public JsonRpcServer createJsonRpc(ObjectMapper mapper, @RpcService Object service, @RpcInterface Class iface) {
-		log.info("creating jsonrpc server from service: {}", service);
+		log.info("creating jsonrpc server from service: mapper:{} iface:{} service:{}", mapper, iface, service);
 		JsonRpcServer handler = new JsonRpcServer(mapper, service, iface);
 		return handler;
 	}

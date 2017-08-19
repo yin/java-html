@@ -8,16 +8,20 @@ import com.github.yin.html.service.WebDocumentStatisticsServiceImpl;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Provides;
 import com.googlecode.jsonrpc4j.JsonRpcServer;
-
+import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.ContextHandler;
-import org.eclipse.jetty.server.handler.ContextHandlerCollection;
-import org.eclipse.jetty.server.handler.DefaultHandler;
-import org.eclipse.jetty.server.handler.ResourceHandler;
+import org.eclipse.jetty.server.handler.*;
 import org.eclipse.jetty.util.resource.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.inject.Singleton;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 public class WebServerMain {
 	private static Logger log = LoggerFactory.getLogger(WebServerMain.class);
@@ -26,15 +30,7 @@ public class WebServerMain {
 		//*
 		Injector injector = Guice.createInjector(
 				new JettyHttpServerModule(),
-				new JsonRpcServerModule(new AbstractModule() {
-					@Override
-					protected void configure() {
-						bind(Class.class).annotatedWith(JsonRpcServerModule.RpcInterface.class)
-								.toInstance(WebDocumentStatisticsService.class);
-						bind(Object.class).annotatedWith(JsonRpcServerModule.RpcService.class)
-								.to(WebDocumentStatisticsServiceImpl.class);
-					}
-				}));
+				new JsonRpcServerModule(new StatisticsServiceModule()));
 		//*/
 
 		//*
@@ -48,34 +44,55 @@ public class WebServerMain {
 			log.info("Starting server");
 		}
 
+
+		//*
+		JsonRpcServer rpcServer = injector.getInstance(JsonRpcServer.class);
+
 		ContextHandler webapp = new ContextHandler();
 		webapp.setContextPath("/");
 		ResourceHandler resourceHandler = new ResourceHandler();
 		resourceHandler.setBaseResource(Resource.newClassPathResource("index.html"));
 		webapp.setHandler(resourceHandler);
-
-		//*
-		JsonRpcServer rpcServer = injector.getInstance(JsonRpcServer.class);
 		/*/
 		WebDocumentStatisticsServiceImpl service = new WebDocumentStatisticsServiceImpl();
 		ObjectMapper mapper = new ObjectMapper();
 		JsonRpcServer rpcServer = new JsonRpcServer(mapper, service, WebDocumentStatisticsService.class);
 		//*/
+
 		WebServiceHandler rpcHandler = new WebServiceHandler(rpcServer);
-		ContextHandler webservice = new ContextHandler();
-		webservice.setContextPath("/api");
+		ContextHandler webservice = new ContextHandler("/api");
 		webservice.setHandler(rpcHandler);
 
 		ContextHandlerCollection contexts = new ContextHandlerCollection();
 		contexts.addHandler(webapp);
 		contexts.addHandler(webservice);
-		contexts.addHandler(new DefaultHandler());
+		//*
 
-		server.setHandler(contexts);
+		server.setHandler(new HandlerList(contexts, new DefaultHandler()));
+		/*/
+		server.setHandler(new HandlerList(contexts, webservice, new DefaultHandler()));
+		//*/
 		server.start();
 		server.join();
 		if (log.isInfoEnabled()) {
 			log.info("Server ended");
+		}
+	}
+
+	private static class StatisticsServiceModule extends AbstractModule {
+		@Override
+        protected void configure() {
+			log.info("stats rpc config");
+
+			bind(Class.class).annotatedWith(JsonRpcServerModule.RpcInterface.class)
+                    .toInstance(WebDocumentStatisticsService.class);
+            bind(Object.class).annotatedWith(JsonRpcServerModule.RpcService.class)
+                    .to(WebDocumentStatisticsServiceImpl.class);
+        }
+
+        @Provides @Singleton
+		WebDocumentStatisticsServiceImpl createWebDocumentStatisticsServiceImpl() {
+			return new WebDocumentStatisticsServiceImpl();
 		}
 	}
 }

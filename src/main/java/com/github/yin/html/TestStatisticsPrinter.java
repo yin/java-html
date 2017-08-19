@@ -15,7 +15,7 @@ public class TestStatisticsPrinter implements Consumer<TextStatictics> {
 	public void accept(TextStatictics stats) {
 		out.printf("Word frequencies:\n");
 		for (Map.Entry entry : stats.wordFrequency().entrySet()) {
-			out.printf("\t%s => %l\n", entry.getKey(), entry.getValue());
+			out.printf("\t%s => %d\n", entry.getKey(), entry.getValue());
 		}
 		out.printf("Longest word: %s\n", stats.longestWord());
 		out.printf("Most used character: %c\n", stats.mostUsedChar());

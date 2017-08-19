@@ -33,7 +33,7 @@ final public class WebServiceHandler extends AbstractHandler {
 			if (log.isDebugEnabled()) {
 				log.debug("received handle http request({}->{})@{}", request.getRemoteHost(), request.getLocalAddr(), request.hashCode());
 			}
-			jsonrpc.handle(request, response);
+			jsonrpc.handle(baseRequest , response);
 			baseRequest.setHandled(true);
 			if (log.isDebugEnabled()) {
 				log.debug("handled http request({}->{})@{}", request.getRemoteHost(), request.getLocalAddr(), request.hashCode());

@@ -39,13 +39,24 @@ public class WebServiceClientMain implements Runnable {
 
 	@FlagDesc("URL of the server API to call remotely. Default: http://localhost:8080/")
 	private static final Flag<String> apiUrl = Flags.create("http://localhost:8080/api");
+	private final String serverApiUrl;
+	private final String documentUrl;
+
+	public WebServiceClientMain(String serverApiUrl, String documentUrl) {
+		this.serverApiUrl = serverApiUrl;
+		this.documentUrl = documentUrl;
+	}
 
 	public static void main(String[] args) throws IOException, InterruptedException {
 		List<String> urls = Flags.parse(args, ImmutableList.of("com.github.yin.html.main"));
 		ExecutorService executor = Executors.newSingleThreadExecutor();
-		for (String url : urls) {
+		for (String documentUrl : urls) {
 			try {
-				executor.execute(new WebServiceClientMain());
+				String serverApiUrl = apiUrl.get();
+				if (!serverApiUrl.endsWith("/")) {
+					serverApiUrl = serverApiUrl.concat("/");
+				}
+				executor.execute(new WebServiceClientMain(serverApiUrl, documentUrl));
 			} catch(Throwable t) {
 				log.error("Error getting response from server", t);
 			}
@@ -56,11 +67,11 @@ public class WebServiceClientMain implements Runnable {
 	@Override
 	public void run() {
 		try {
-			Injector injector = Guice.createInjector(new ClientModule(apiUrl.get()));
+			Injector injector = Guice.createInjector(new ClientModule(serverApiUrl));
 			WebDocumentStatisticsService client = injector.getInstance(WebDocumentStatisticsService.class);
 
 			log.info("Making request");
-			TextStatictics response = client.computeStatictics("Test this String, test it well");
+			TextStatictics response = client.computeStatictics(documentUrl);
 			TestStatisticsPrinter printer = new TestStatisticsPrinter(System.out);
 			log.info("Response received");
 

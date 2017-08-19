@@ -6,10 +6,7 @@ import com.github.yin.html.TextProcessingTask;
 import com.github.yin.html.TextStatictics;
 import com.github.yin.html.WebDocumentProvider;
 import com.github.yin.html.main.CommandLineMain;
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Provides;
+import com.google.inject.*;
 
 import java.util.function.Consumer;
 
@@ -21,13 +18,11 @@ import org.slf4j.LoggerFactory;
 public class WebDocumentStatisticsServiceImpl implements WebDocumentStatisticsService {
 	private static final Logger log = LoggerFactory.getLogger(CommandLineMain.class);
 
-	public WebDocumentStatisticsServiceImpl() {
-	}
-
 	@Override
 	public TextStatictics computeStatictics(String url) {
 		Injector injector = Guice.createInjector(new WebDocumentStatisticsModule(url));
-		TextProcessingTask<TextStatictics> task = injector.getInstance(TextProcessingTask.class);
+		TextProcessingTask<TextStatictics> task = injector.getInstance(
+				Key.get(new TypeLiteral<TextProcessingTask<TextStatictics>>() {}));
 		return task.execute();
 	}
 
@@ -44,7 +39,8 @@ public class WebDocumentStatisticsServiceImpl implements WebDocumentStatisticsSe
 		}
 
 		@Provides
-		TextProcessingTask<TextStatictics> createTextProcessingTask(DocumentProvider provider, StatisticProcessor processor, @Named("StatisticsConsumer") Consumer consumer) {
+		TextProcessingTask<TextStatictics> createTextProcessingTask(DocumentProvider provider,
+				StatisticProcessor processor) {
 			return new TextProcessingTask<>(provider, processor);
 		}
 
