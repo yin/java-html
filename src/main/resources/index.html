@@ -27,9 +27,11 @@
                     $('#result_longestWord').text(data.result.longestWord)
                     $('#result_mostUsedChar').text(data.result.mostUsedChar)
                     var wf = data.result.wordFrequency;
+                    var resultWf = $('#result_wordFrequencies');
+                    resultWf.empty();
                     for (var word in wf) {
                         var tr = $('<tr/>');
-                        $('#result_wordFrequencies').append(tr)
+                        resultWf.append(tr)
                         tr.append($('<th/>').text(word));
                         tr.append($('<td/>').text(wf[word]));
                     }

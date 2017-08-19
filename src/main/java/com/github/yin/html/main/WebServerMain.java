@@ -1,10 +1,14 @@
 package com.github.yin.html.main;
 
+import com.github.yin.flags.Flag;
+import com.github.yin.flags.Flags;
+import com.github.yin.flags.annotations.FlagDesc;
 import com.github.yin.html.jetty.WebServiceHandler;
 import com.github.yin.html.modules.JettyHttpServerModule;
 import com.github.yin.html.modules.JsonRpcServerModule;
 import com.github.yin.html.service.WebDocumentStatisticsService;
 import com.github.yin.html.service.WebDocumentStatisticsServiceImpl;
+import com.google.common.collect.ImmutableList;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -18,12 +22,17 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Singleton;
 
+@FlagDesc
 public class WebServerMain {
+	@FlagDesc("Server port to listen on")
+	private static final Flag<Integer> port = Flags.create(8080);
+
 	private static Logger log = LoggerFactory.getLogger(WebServerMain.class);
 
 	public static void main(String[] args) throws Exception {
+		Flags.parse(args, ImmutableList.of("com.github.yin.html.main"));
 		Injector injector = Guice.createInjector(
-				new JettyHttpServerModule(),
+				new JettyHttpServerModule(port.get()),
 				new JsonRpcServerModule(new StatisticsServiceModule()));
 
 		Server server = injector.getInstance(Server.class);

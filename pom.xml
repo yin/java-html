@@ -179,9 +179,6 @@
 	<configuration>
 	  <executable>maven</executable>
 	  <mainClass>com.github.yin.html.main.WebServerMain</mainClass>
-	  <arguments>
-	    <argument>https://en.wikipedia.org/</argument>
-	  </arguments>
 	</configuration>
       </plugin>
       <plugin>
@@ -192,7 +189,7 @@
 	  <archive>
 	    <manifest>
 	      <addClasspath>true</addClasspath>
-	      <mainClass>com.github.yin.html.CommandLineMain</mainClass>
+	      <mainClass>com.github.yin.html.main.WebServerMain</mainClass>
 	    </manifest>
 	  </archive>
 	</configuration>
