@@ -18,4 +18,14 @@ Now go to http://localhost:8080/
 Options
 =======
 
-You can use the --apiURL
+After building the sources you can run the server directly:
+
+````sh
+java -jar target/extractor-0.0.1.jar
+````
+
+You can change the server port by passing the --port argument:
+
+````sh
+java -jar target/extractor-0.0.1.jar --port 12345
+````
